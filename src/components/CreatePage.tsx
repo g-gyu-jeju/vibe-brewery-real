@@ -72,17 +72,12 @@ export default function CreatePage({ onComplete }: { onComplete: (result: any) =
   const handleSubmit = async () => {
     setLoading(true);
     setLoadingText('페르소나를 분석하여 레시피를 설계 중입니다...');
-    console.log('Starting recipe generation with data:', data);
     
     try {
-      // 1. Generate Recipe
       const beerData = await generateBeerRecipe(data);
-      console.log('Recipe generated successfully:', beerData);
-
       if (!beerData || Object.keys(beerData).length === 0) {
         throw new Error('Generated recipe is empty.');
       }
-
       onComplete(beerData);
     } catch (error: any) {
       console.error('Generation failed:', error);
@@ -96,86 +91,89 @@ export default function CreatePage({ onComplete }: { onComplete: (result: any) =
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center space-y-8">
-        <div className="grain-overlay" />
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center space-y-8 bg-vb-bg">
         <div className="relative">
           <motion.div 
             animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="w-32 h-32 rounded-full border-t-2 border-brew-amber"
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="w-32 h-32 rounded-full border-t-2 border-vb-primary-container border-r-2"
           />
           <div className="absolute inset-0 flex items-center justify-center">
-            <Beer size={40} className="text-brew-amber animate-pulse" />
+            <Beer size={40} className="text-vb-on-surface" />
           </div>
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-display text-brew-amber">Brewing in Progress...</h2>
-          <p className="text-brew-cream/60">{loadingText}</p>
+          <h2 className="text-2xl font-headline font-black uppercase tracking-tighter">Brewing...</h2>
+          <p className="text-vb-on-surface/50">{loadingText}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-12 relative overflow-hidden">
-      <div className="grain-overlay" />
-      
-      {/* Progress Bar */}
-      <div className="w-full max-w-2xl mb-12">
-        <div className="flex justify-between items-end mb-2">
-          <span className="text-brew-amber font-display text-sm tracking-widest uppercase">Step {step} of 7</span>
-          <span className="text-brew-cream/40 text-xs font-mono">{Math.round(progress)}%</span>
+    <div className="min-h-screen bg-vb-bg">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-vb-bg px-6 py-4 max-w-[1440px] mx-auto flex justify-between items-center">
+        <div className="text-3xl font-black text-vb-on-surface tracking-tighter font-headline uppercase">
+          Vibe Brewery
         </div>
-        <div className="h-1 w-full bg-brew-cream/10 rounded-full overflow-hidden">
-          <motion.div 
-            className="h-full bg-brew-amber"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5, ease: "circOut" }}
-          />
-        </div>
-      </div>
+      </header>
 
-      <main className="w-full max-w-2xl flex-grow flex flex-col">
+      <main className="max-w-[1440px] mx-auto px-6 pt-8 pb-32">
+        {/* Progress Header */}
+        <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="max-w-xl">
+            <span className="font-headline text-sm uppercase tracking-widest text-vb-primary font-bold">
+              The Brew Wizard — Step {step} of 7
+            </span>
+            <h1 className="font-headline text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter mt-4 uppercase italic">
+              {step === 1 && <>Craft Your <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Identity.</span></>}
+              {step === 2 && <>Current <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Mood.</span></>}
+              {step === 3 && <>Your <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Setting.</span></>}
+              {step === 4 && <>Flavor <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Profile.</span></>}
+              {step === 5 && <>ABV <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Impact.</span></>}
+              {step === 6 && <>The <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Foundation.</span></>}
+              {step === 7 && <>The <br/><span className="text-vb-primary-container bg-vb-on-surface px-4 py-1 not-italic">Soul.</span></>}
+            </h1>
+          </div>
+          {/* Step Indicators */}
+          <div className="flex gap-2 h-1 items-center">
+            {Array.from({ length: 7 }, (_, i) => (
+              <div
+                key={i}
+                className={`h-full rounded-full transition-all duration-500 ${
+                  i + 1 <= step ? 'w-12 bg-vb-primary-container' : 'w-8 bg-vb-surface-container'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Step Content */}
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="flex-grow flex flex-col"
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            {step === 1 && (
-              <Step1 data={data} updateData={updateData} />
-            )}
-            {step === 2 && (
-              <Step2 data={data} updateData={updateData} toggleTag={toggleTag} />
-            )}
-            {step === 3 && (
-              <Step3 data={data} updateData={updateData} />
-            )}
-            {step === 4 && (
-              <Step4 data={data} updateData={updateData} />
-            )}
-            {step === 5 && (
-              <Step5 data={data} updateData={updateData} />
-            )}
-            {step === 6 && (
-              <Step6 data={data} updateData={updateData} />
-            )}
-            {step === 7 && (
-              <Step7 data={data} updateData={updateData} />
-            )}
+            {step === 1 && <Step1 data={data} updateData={updateData} />}
+            {step === 2 && <Step2 data={data} updateData={updateData} toggleTag={toggleTag} />}
+            {step === 3 && <Step3 data={data} updateData={updateData} />}
+            {step === 4 && <Step4 data={data} updateData={updateData} />}
+            {step === 5 && <Step5 data={data} updateData={updateData} />}
+            {step === 6 && <Step6 data={data} updateData={updateData} />}
+            {step === 7 && <Step7 data={data} updateData={updateData} />}
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Buttons */}
-        <div className="mt-12 flex justify-between items-center">
+        {/* Navigation */}
+        <div className="mt-16 flex justify-between items-center max-w-3xl">
           <button
             onClick={prevStep}
             disabled={step === 1}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full border border-brew-cream/20 text-brew-cream/60 transition-all hover:bg-brew-cream/5 disabled:opacity-0 disabled:pointer-events-none`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full border-2 border-vb-on-surface/10 text-vb-on-surface/60 font-headline font-bold uppercase transition-all hover:border-vb-on-surface/30 disabled:opacity-0 disabled:pointer-events-none`}
           >
             <ChevronLeft size={18} />
             Back
@@ -184,7 +182,7 @@ export default function CreatePage({ onComplete }: { onComplete: (result: any) =
           {step < 7 ? (
             <button
               onClick={nextStep}
-              className="group flex items-center gap-2 px-8 py-3 rounded-full bg-brew-amber text-brew-black font-bold transition-all hover:bg-brew-gold hover:scale-105 active:scale-95"
+              className="group flex items-center gap-2 px-10 py-3 rounded-full bg-vb-primary-container text-vb-on-surface font-headline font-black uppercase tracking-tighter transition-all hover:scale-105 active:scale-95"
             >
               Next
               <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
@@ -192,9 +190,9 @@ export default function CreatePage({ onComplete }: { onComplete: (result: any) =
           ) : (
             <button
               onClick={handleSubmit}
-              className="px-10 py-3 rounded-full bg-brew-amber text-brew-black font-bold transition-all hover:bg-brew-gold hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(212,129,26,0.3)]"
+              className="px-12 py-4 rounded-full bg-vb-primary-container text-vb-on-surface font-headline font-black text-xl uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 shadow-xl"
             >
-              Brew My Beer
+              Submit Blueprint
             </button>
           )}
         </div>
@@ -203,104 +201,135 @@ export default function CreatePage({ onComplete }: { onComplete: (result: any) =
   );
 }
 
-/* --- Step Components (Same as before) --- */
+/* --- Pill Button Component --- */
+function PillButton({ selected, onClick, children, className = '' }: { selected: boolean, onClick: () => void, children: React.ReactNode, className?: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-8 py-3 rounded-full font-headline font-bold uppercase transition-all hover:scale-105 ${
+        selected
+          ? 'bg-vb-on-surface text-vb-bg'
+          : 'bg-vb-surface-container text-vb-on-surface hover:bg-vb-surface-high'
+      } ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* --- Card Button Component --- */
+function CardButton({ selected, onClick, children, className = '' }: { selected: boolean, onClick: () => void, children: React.ReactNode, className?: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-6 py-4 rounded-xl border-2 font-headline text-2xl font-black transition-colors ${
+        selected
+          ? 'border-vb-on-surface bg-vb-primary-container'
+          : 'border-vb-on-surface/5 bg-vb-surface hover:bg-vb-primary-container/50'
+      } ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* --- Step Components --- */
 function Step1({ data, updateData }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void }) {
   const genders = ['남성', '여성', '논바이너리', '선택 안 함'];
   const ages = ['20대', '30대', '40대', '50대+'];
 
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">나는 누구인가</h2>
-        <p className="text-brew-cream/60">당신에 대해 조금 더 알려주세요.</p>
-      </header>
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+      <div className="md:col-span-5 space-y-12">
+        <div>
+          <p className="text-lg text-vb-on-surface/60 mb-12 max-w-sm">
+            Every great brew starts with the soul. Tell us who's holding the glass.
+          </p>
+        </div>
 
-      <div className="space-y-8">
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4 flex items-center gap-2">
-            <User size={14} /> 성별
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
+        <div>
+          <span className="block text-xs font-black uppercase tracking-widest mb-4">Identity</span>
+          <div className="flex flex-wrap gap-3">
             {genders.map((g) => (
-              <button
-                key={g}
-                onClick={() => updateData({ gender: g })}
-                className={`p-4 rounded-xl border transition-all text-left ${
-                  data.gender === g 
-                    ? 'border-brew-amber bg-brew-amber/10 text-brew-amber' 
-                    : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
-                }`}
-              >
+              <PillButton key={g} selected={data.gender === g} onClick={() => updateData({ gender: g })}>
                 {g}
-              </button>
+              </PillButton>
             ))}
           </div>
-        </section>
+        </div>
 
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4">연령대</h3>
+        <div>
+          <span className="block text-xs font-black uppercase tracking-widest mb-4">Age Group</span>
           <div className="grid grid-cols-2 gap-3">
             {ages.map((a) => (
-              <button
-                key={a}
-                onClick={() => updateData({ ageGroup: a })}
-                className={`p-4 rounded-xl border transition-all text-left ${
-                  data.ageGroup === a 
-                    ? 'border-brew-amber bg-brew-amber/10 text-brew-amber' 
-                    : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
-                }`}
-              >
+              <CardButton key={a} selected={data.ageGroup === a} onClick={() => updateData({ ageGroup: a })}>
                 {a}
-              </button>
+              </CardButton>
             ))}
           </div>
-        </section>
+        </div>
+      </div>
+
+      <div className="md:col-span-7 relative hidden md:block">
+        <div className="aspect-[4/5] bg-vb-surface-container rounded-xl overflow-hidden flex items-center justify-center" style={{ marginRight: '-10%' }}>
+          <div className="text-center p-12">
+            <User size={80} className="text-vb-on-surface/20 mx-auto mb-8" />
+            <p className="font-headline text-4xl font-black text-vb-on-surface/10 uppercase">Persona</p>
+          </div>
+        </div>
+        <div className="absolute -bottom-10 -left-10 bg-vb-primary-container p-10 rounded-xl max-w-xs rotate-3">
+          <p className="font-headline font-bold text-lg uppercase leading-tight text-vb-on-surface">
+            The character defines the chemistry.
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
-function Step2({ data, updateData, toggleTag }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void, toggleTag: (t: string) => void }) {
-  const tags = ['설렘', '피곤함', '행복함', '쓸쓸함', '신남', '차분함', '성취감', '그리움'];
+function Step2({ data, updateData, toggleTag }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void, toggleTag: (tag: string) => void }) {
+  const emotions = ['지친', '설레는', '우울한', '신나는', '차분한', '감성적인', '여유로운', '도전적인', '그리운', '행복한'];
 
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">지금 나의 기분</h2>
-        <p className="text-brew-cream/60">현재의 감정이 맥주의 풍미가 됩니다.</p>
-      </header>
-
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
       <div className="space-y-8">
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4 flex items-center gap-2">
-            <Smile size={14} /> 자유롭게 적어주세요
-          </h3>
+        <p className="text-xl italic font-light mb-8 text-vb-on-surface/60">
+          How are we feeling right now? Select all that apply.
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          {emotions.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => toggleTag(tag)}
+              className={`px-6 py-2 rounded-full border-2 font-headline font-bold uppercase transition-all ${
+                data.emotionTags.includes(tag)
+                  ? 'border-vb-on-surface bg-vb-primary-container'
+                  : 'border-vb-on-surface/10 hover:border-vb-on-surface'
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+
+        <div className="pt-8">
+          <label className="block text-xs font-black uppercase tracking-widest mb-4">오늘 하루를 들려주세요</label>
           <textarea
             value={data.moodText}
             onChange={(e) => updateData({ moodText: e.target.value })}
-            placeholder="지금 기분을 자유롭게 적어주세요..."
-            className="w-full h-32 p-4 rounded-xl bg-brew-cream/5 border border-brew-cream/10 focus:border-brew-amber outline-none transition-all resize-none"
+            placeholder="오늘 어떤 하루를 보내셨나요..."
+            className="w-full bg-vb-surface-container border-none rounded-xl p-6 focus:ring-2 focus:ring-vb-primary-container text-lg resize-none outline-none"
+            rows={4}
           />
-        </section>
+        </div>
+      </div>
 
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4">감정 태그 (다중 선택)</h3>
-          <div className="flex flex-wrap gap-2">
-            {tags.map((t) => (
-              <button
-                key={t}
-                onClick={() => toggleTag(t)}
-                className={`px-4 py-2 rounded-full border transition-all ${
-                  data.emotionTags.includes(t)
-                    ? 'border-brew-amber bg-brew-amber text-brew-black font-medium'
-                    : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </section>
+      <div className="bg-vb-secondary p-12 rounded-xl flex flex-col justify-end min-h-[400px] hidden md:flex">
+        <Smile size={80} className="text-vb-bg mb-8" />
+        <h3 className="font-headline text-5xl font-black text-vb-bg uppercase leading-none italic">
+          Emotion<br />Driven<br />Extracts
+        </h3>
       </div>
     </div>
   );
@@ -311,54 +340,43 @@ function Step3({ data, updateData }: { data: PersonaData, updateData: (u: Partia
   const locations = ['집 거실', '루프탑 바', '야외 피크닉', '아늑한 펍', '해변', '캠핑장'];
 
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">지금 나의 상황</h2>
-        <p className="text-brew-cream/60">어디서 누구와 함께하고 있나요?</p>
-      </header>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="bg-vb-surface-container p-8 rounded-xl">
+        <span className="block text-xs font-black uppercase tracking-widest mb-8">Who are you with?</span>
+        <div className="space-y-3">
+          {companions.map((c) => (
+            <label
+              key={c}
+              onClick={() => updateData({ companion: c })}
+              className={`flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors ${
+                data.companion === c ? 'bg-vb-primary-container' : 'bg-vb-surface hover:bg-vb-surface-dim'
+              }`}
+            >
+              <span className="font-headline font-bold uppercase">{c}</span>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                data.companion === c ? 'border-vb-on-surface bg-vb-on-surface' : 'border-vb-on-surface/20'
+              }`}>
+                {data.companion === c && <Check size={12} className="text-vb-bg" />}
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
 
-      <div className="space-y-8">
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4 flex items-center gap-2">
-            동행자
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {companions.map((c) => (
-              <button
-                key={c}
-                onClick={() => updateData({ companion: c })}
-                className={`p-4 rounded-xl border transition-all text-center ${
-                  data.companion === c 
-                    ? 'border-brew-amber bg-brew-amber/10 text-brew-amber' 
-                    : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4 flex items-center gap-2">
-            <MapPin size={14} /> 장소/분위기
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            {locations.map((l) => (
-              <button
-                key={l}
-                onClick={() => updateData({ location: l })}
-                className={`p-4 rounded-xl border transition-all text-left ${
-                  data.location === l 
-                    ? 'border-brew-amber bg-brew-amber/10 text-brew-amber' 
-                    : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
-                }`}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-        </section>
+      <div className="grid grid-cols-2 gap-3">
+        {locations.map((l) => (
+          <button
+            key={l}
+            onClick={() => updateData({ location: l })}
+            className={`aspect-square rounded-xl flex items-center justify-center font-headline font-bold uppercase tracking-widest text-sm transition-all ${
+              data.location === l
+                ? 'bg-vb-primary-container ring-4 ring-vb-primary-container text-vb-on-surface'
+                : 'bg-vb-surface-container text-vb-on-surface/60 hover:bg-vb-surface-high'
+            }`}
+          >
+            {l}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -366,28 +384,29 @@ function Step3({ data, updateData }: { data: PersonaData, updateData: (u: Partia
 
 function Step4({ data, updateData }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void }) {
   const sliders = [
-    { key: 'bitterness', label: '쓴맛 강도', desc: '홉의 쌉싸름함' },
-    { key: 'sweetness', label: '단맛 강도', desc: '몰트의 달콤함' },
-    { key: 'fruitiness', label: '신맛/과일향 강도', desc: '산뜻하고 화사함' },
-    { key: 'carbonation', label: '탄산감', desc: '청량한 목넘김' },
+    { key: 'bitterness', label: 'Bitterness', desc: '홉의 쌉싸름함', minLabel: 'Smooth', maxLabel: 'Abrasive' },
+    { key: 'sweetness', label: 'Sweetness', desc: '몰트의 달콤함', minLabel: 'Bone Dry', maxLabel: 'Dessert' },
+    { key: 'fruitiness', label: 'Fruitiness', desc: '산뜻하고 화사함', minLabel: 'Earthy', maxLabel: 'Tropical' },
+    { key: 'carbonation', label: 'Carbonation', desc: '청량한 목넘김', minLabel: 'Flat', maxLabel: 'Effervescent' },
   ];
 
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">원하는 맛의 느낌</h2>
-        <p className="text-brew-cream/60">당신이 상상하는 그 맛을 조절해보세요.</p>
-      </header>
+    <div className="max-w-3xl mx-auto">
+      <p className="text-center text-vb-on-surface/50 mb-16 uppercase tracking-[0.2em] text-sm font-bold">
+        Fine-tune the sensory variables
+      </p>
 
-      <div className="space-y-12 py-4">
+      <div className="space-y-16">
         {sliders.map((s) => (
-          <section key={s.key} className="space-y-4">
+          <div key={s.key} className="space-y-4">
             <div className="flex justify-between items-end">
               <div>
-                <h3 className="text-lg font-medium">{s.label}</h3>
-                <p className="text-xs text-brew-cream/40">{s.desc}</p>
+                <span className="font-headline text-2xl font-black uppercase italic">{s.label}</span>
+                <p className="text-xs text-vb-on-surface/40 mt-1">{s.desc}</p>
               </div>
-              <span className="text-brew-amber font-mono text-xl">{(data as any)[s.key]}</span>
+              <span className="font-headline text-4xl font-black text-vb-primary">
+                {String((data as any)[s.key]).padStart(2, '0')}
+              </span>
             </div>
             <input
               type="range"
@@ -396,13 +415,13 @@ function Step4({ data, updateData }: { data: PersonaData, updateData: (u: Partia
               step="1"
               value={(data as any)[s.key]}
               onChange={(e) => updateData({ [s.key]: parseInt(e.target.value) })}
-              className="w-full h-1.5 bg-brew-cream/10 rounded-full appearance-none cursor-pointer accent-brew-amber"
+              className="w-full"
             />
-            <div className="flex justify-between text-[10px] text-brew-cream/20 uppercase tracking-tighter">
-              <span>Mild</span>
-              <span>Intense</span>
+            <div className="flex justify-between text-[10px] font-black uppercase text-vb-on-surface/20">
+              <span>{s.minLabel}</span>
+              <span>{s.maxLabel}</span>
             </div>
-          </section>
+          </div>
         ))}
       </div>
     </div>
@@ -411,81 +430,72 @@ function Step4({ data, updateData }: { data: PersonaData, updateData: (u: Partia
 
 function Step5({ data, updateData }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void }) {
   const abvs = [
-    { id: 'light', label: '가볍게', range: '1–3.9%', desc: '낮에도 부담 없이 즐기는 청량함' },
-    { id: 'medium', label: '적당히', range: '4–5.9%', desc: '가장 대중적이고 밸런스 좋은 도수' },
-    { id: 'strong', label: '강하게', range: '6%+', desc: '풍부한 바디감과 묵직한 타격감' },
+    { id: 'light', label: '가볍게', range: '1–3.9%', desc: 'Sessionable, crisp, and ready for a long afternoon.' },
+    { id: 'medium', label: '적당히', range: '4–5.9%', desc: 'The balanced middle ground. The gold standard.' },
+    { id: 'strong', label: '강하게', range: '6%+', desc: 'Bold, heavy-hitting, and deeply complex profiles.' },
   ];
 
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">도수 선택</h2>
-        <p className="text-brew-cream/60">맥주의 무게감을 결정합니다.</p>
-      </header>
-
-      <div className="space-y-4">
-        {abvs.map((a) => (
-          <button
-            key={a.id}
-            onClick={() => updateData({ abvPreference: a.label })}
-            className={`w-full p-6 rounded-2xl border transition-all text-left flex justify-between items-center group ${
-              data.abvPreference === a.label 
-                ? 'border-brew-amber bg-brew-amber/10' 
-                : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
-            }`}
-          >
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <h3 className={`text-xl font-bold ${data.abvPreference === a.label ? 'text-brew-amber' : ''}`}>{a.label}</h3>
-                <span className="text-xs px-2 py-0.5 rounded bg-brew-cream/10 text-brew-cream/60">{a.range}</span>
-              </div>
-              <p className="text-sm text-brew-cream/40">{a.desc}</p>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {abvs.map((a) => (
+        <div
+          key={a.id}
+          onClick={() => updateData({ abvPreference: a.label })}
+          className="group cursor-pointer"
+        >
+          <div className={`h-64 rounded-xl mb-6 flex items-center justify-center transition-all ${
+            data.abvPreference === a.label
+              ? 'bg-vb-on-surface text-vb-bg'
+              : 'bg-vb-surface-container text-vb-on-surface group-hover:bg-vb-primary-container'
+          }`}>
+            <div className="text-center">
+              <span className="font-headline text-5xl md:text-6xl font-black block">{a.range}</span>
+              <span className={`font-headline font-bold uppercase tracking-widest ${
+                data.abvPreference === a.label ? 'text-vb-primary-container' : 'opacity-40'
+              }`}>
+                {a.id}
+              </span>
             </div>
-            <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
-              data.abvPreference === a.label ? 'bg-brew-amber border-brew-amber' : 'border-brew-cream/20'
-            }`}>
-              {data.abvPreference === a.label && <Check size={14} className="text-brew-black" />}
-            </div>
-          </button>
-        ))}
-      </div>
+          </div>
+          <p className="text-sm uppercase font-bold leading-tight">{a.desc}</p>
+        </div>
+      ))}
     </div>
   );
 }
 
 function Step6({ data, updateData }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void }) {
   const styles = [
-    { name: '라거', desc: '청량하고 깔끔한 맛', icon: '🍺' },
-    { name: '에일', desc: '풍부하고 향긋한 풍미', icon: '🍷' },
-    { name: '위트', desc: '부드럽고 은은한 밀 향', icon: '🌾' },
-    { name: 'IPA', desc: '홉 향이 강렬하고 쌉싸름', icon: '🌿' },
-    { name: '스타우트', desc: '진하고 묵직한 흑맥주', icon: '☕' },
-    { name: '사워', desc: '새콤하고 독특한 매력', icon: '🍋' },
+    { name: '라거', icon: '🍺' },
+    { name: '에일', icon: '🍷' },
+    { name: '위트', icon: '🌾' },
+    { name: 'IPA', icon: '🌿' },
+    { name: '스타우트', icon: '☕' },
+    { name: '사워', icon: '🍋' },
   ];
 
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">맥주 스타일</h2>
-        <p className="text-brew-cream/60">기본이 되는 맥주의 성격을 골라주세요.</p>
-      </header>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-4">
+        <div />
+        <p className="text-sm font-bold uppercase text-vb-on-surface/40 max-w-xs md:text-right">
+          Select your preferred base style. We'll build your custom vibe from here.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-vb-on-surface/5 rounded-xl overflow-hidden border border-vb-on-surface/5">
         {styles.map((s) => (
           <button
             key={s.name}
             onClick={() => updateData({ beerStyle: s.name })}
-            className={`p-6 rounded-2xl border transition-all text-left flex gap-4 items-start ${
-              data.beerStyle === s.name 
-                ? 'border-brew-amber bg-brew-amber/10' 
-                : 'border-brew-cream/10 bg-brew-cream/5 hover:border-brew-cream/30'
+            className={`p-10 flex flex-col items-center justify-center transition-colors ${
+              data.beerStyle === s.name
+                ? 'bg-vb-primary-container'
+                : 'bg-vb-bg hover:bg-vb-primary-container/30'
             }`}
           >
-            <span className="text-3xl">{s.icon}</span>
-            <div className="space-y-1">
-              <h3 className={`text-lg font-bold ${data.beerStyle === s.name ? 'text-brew-amber' : ''}`}>{s.name}</h3>
-              <p className="text-xs text-brew-cream/40 leading-relaxed">{s.desc}</p>
-            </div>
+            <span className="text-4xl mb-4">{s.icon}</span>
+            <span className="font-headline font-black uppercase text-xl">{s.name}</span>
           </button>
         ))}
       </div>
@@ -495,32 +505,30 @@ function Step6({ data, updateData }: { data: PersonaData, updateData: (u: Partia
 
 function Step7({ data, updateData }: { data: PersonaData, updateData: (u: Partial<PersonaData>) => void }) {
   return (
-    <div className="space-y-10">
-      <header>
-        <h2 className="text-4xl mb-2">마지막 한 마디</h2>
-        <p className="text-brew-cream/60">이 맥주에 담고 싶은 특별한 이야기가 있나요?</p>
-      </header>
+    <div className="max-w-4xl">
+      <div className="flex items-baseline gap-4 mb-12">
+        <div className="h-px flex-grow bg-vb-on-surface/10" />
+      </div>
 
-      <div className="space-y-6">
-        <section>
-          <h3 className="text-xs uppercase tracking-widest text-brew-amber mb-4 flex items-center gap-2">
-            <MessageSquare size={14} /> 특별 요청 (선택 사항)
-          </h3>
-          <textarea
-            value={data.extraNote}
-            onChange={(e) => updateData({ extraNote: e.target.value })}
-            placeholder="예: '첫사랑의 아련함을 담아주세요', '캠핑장에서 마시기 좋은 맥주였으면 해요' 등..."
-            className="w-full h-48 p-6 rounded-2xl bg-brew-cream/5 border border-brew-cream/10 focus:border-brew-amber outline-none transition-all resize-none text-lg"
-          />
-        </section>
+      <div className="bg-vb-surface-container p-1 rounded-xl">
+        <label className="block p-8 pb-2 text-xs font-black uppercase tracking-[0.3em] text-vb-on-surface/30">
+          이 맥주에 담고 싶은 특별한 이야기가 있나요?
+        </label>
+        <textarea
+          value={data.extraNote}
+          onChange={(e) => updateData({ extraNote: e.target.value })}
+          placeholder="예: '첫사랑의 아련함을 담아주세요'..."
+          className="w-full bg-transparent border-none p-8 font-headline text-2xl md:text-4xl font-bold placeholder:text-vb-on-surface/10 focus:ring-0 min-h-[250px] resize-none outline-none"
+        />
+      </div>
 
-        <div className="p-6 rounded-2xl bg-brew-amber/5 border border-brew-amber/20 flex gap-4 items-start">
-          <Zap size={20} className="text-brew-amber shrink-0 mt-1" />
-          <p className="text-sm text-brew-cream/60 leading-relaxed">
-            이제 AI가 당신의 페르소나를 분석하여 세상에 단 하나뿐인 맥주 레시피를 생성합니다. 
-            잠시만 기다려주세요!
-          </p>
+      <div className="mt-12 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-full border-2 border-vb-on-surface flex items-center justify-center">
+          <Zap size={20} />
         </div>
+        <p className="text-xs font-black uppercase tracking-widest max-w-[280px] text-vb-on-surface/50">
+          AI가 당신의 페르소나를 분석하여 레시피를 생성합니다.
+        </p>
       </div>
     </div>
   );

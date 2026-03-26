@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Beer, Search, Filter, TrendingUp, Clock, ArrowLeft } from 'lucide-react';
 
-// Mock data for the gallery
 const MOCK_BEERS = [
   {
     id: '1',
@@ -48,78 +47,84 @@ const MOCK_BEERS = [
 
 export default function BreweryPage({ onBack }: { onBack: () => void }) {
   return (
-    <div className="min-h-screen pb-24 relative">
-      <div className="grain-overlay" />
-      
+    <div className="min-h-screen pb-24 bg-vb-bg">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-brew-black/80 backdrop-blur-md border-b border-brew-cream/10 px-8 py-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <header className="sticky top-0 z-30 bg-vb-bg/80 backdrop-blur-xl border-b border-vb-on-surface/5 px-6 py-4">
+        <div className="max-w-[1440px] mx-auto flex justify-between items-center">
           <div className="flex items-center gap-6">
             <button 
               onClick={onBack}
-              className="p-2 rounded-full hover:bg-brew-cream/10 transition-all text-brew-cream/60"
+              className="w-10 h-10 rounded-full border-2 border-vb-on-surface/10 flex items-center justify-center hover:border-vb-on-surface/30 hover:scale-105 transition-all"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={18} />
             </button>
-            <h1 className="text-3xl font-display">Brewery Gallery</h1>
+            <h1 className="text-3xl font-headline font-black uppercase tracking-tighter">Gallery</h1>
           </div>
           
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <div className="relative">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brew-cream/30" />
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-vb-on-surface/30" />
               <input 
                 type="text" 
-                placeholder="맥주 이름, 스타일 검색..."
-                className="pl-12 pr-6 py-2 rounded-full bg-brew-cream/5 border border-brew-cream/10 focus:border-brew-amber outline-none transition-all w-64"
+                placeholder="Search..."
+                className="pl-11 pr-6 py-2.5 rounded-full bg-vb-surface-container border-none focus:ring-2 focus:ring-vb-primary-container outline-none text-sm w-56"
               />
             </div>
-            <button className="p-2 rounded-full border border-brew-cream/10 hover:bg-brew-cream/5">
-              <Filter size={18} className="text-brew-cream/60" />
-            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-8 py-12 space-y-12">
-        {/* Featured Section */}
-        <section className="space-y-6">
-          <div className="flex justify-between items-end">
-            <h2 className="text-2xl flex items-center gap-2">
-              <TrendingUp size={24} className="text-brew-amber" /> Trending Now
+      <main className="max-w-[1440px] mx-auto px-6 py-12 space-y-16">
+        {/* Trending Section */}
+        <section className="space-y-8">
+          <div className="flex items-baseline gap-4">
+            <h2 className="font-headline text-4xl font-black uppercase tracking-tighter">
+              Trending Now
             </h2>
+            <div className="h-px flex-grow bg-vb-on-surface/10" />
           </div>
+
+          {/* Magazine-style asymmetric grid: first card is 2x */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {MOCK_BEERS.map((beer, i) => (
               <motion.div
                 key={beer.id}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: i * 0.1 }}
-                className="group rounded-3xl overflow-hidden bg-brew-cream/5 border border-brew-cream/10 hover:border-brew-amber/30 transition-all"
+                transition={{ delay: i * 0.08 }}
+                className={`group rounded-xl overflow-hidden bg-vb-surface border border-vb-on-surface/5 hover:border-vb-primary-container transition-all hover:-translate-y-1 ${
+                  i === 0 ? 'lg:col-span-2 lg:row-span-2' : ''
+                }`}
               >
-                <div className="aspect-square relative overflow-hidden">
+                <div className={`relative overflow-hidden ${i === 0 ? 'aspect-[4/3] lg:aspect-auto lg:h-[400px]' : 'aspect-square'}`}>
                   <img 
                     src={beer.image} 
                     alt={beer.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-brew-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono uppercase tracking-widest">
+                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-vb-bg/90 backdrop-blur-md text-[10px] font-headline font-black uppercase tracking-widest">
                     {beer.style}
                   </div>
                 </div>
                 <div className="p-6 space-y-3">
                   <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-bold group-hover:text-brew-amber transition-colors">{beer.name}</h3>
-                    <span className="text-xs text-brew-amber font-mono">{beer.abv}%</span>
+                    <h3 className={`font-headline font-black uppercase group-hover:text-vb-primary transition-colors ${
+                      i === 0 ? 'text-2xl' : 'text-lg'
+                    }`}>
+                      {beer.name}
+                    </h3>
+                    <span className="text-xs text-vb-primary font-mono font-bold">{beer.abv}%</span>
                   </div>
-                  <p className="text-xs text-brew-cream/40 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-vb-on-surface/40 line-clamp-2 leading-relaxed">
                     {beer.description}
                   </p>
-                  <div className="pt-4 flex justify-between items-center border-t border-brew-cream/5">
-                    <span className="text-[10px] text-brew-cream/30 uppercase tracking-tighter">by {beer.author}</span>
-                    <div className="flex items-center gap-1 text-xs text-brew-cream/60">
-                      <Beer size={12} className="text-brew-amber" />
+                  <div className="pt-4 flex justify-between items-center border-t border-vb-on-surface/5">
+                    <span className="text-[10px] text-vb-on-surface/30 uppercase tracking-wider font-bold">
+                      by {beer.author}
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-vb-on-surface/50 font-bold">
+                      <Beer size={14} className="text-vb-primary" />
                       {beer.likes}
                     </div>
                   </div>
@@ -130,17 +135,18 @@ export default function BreweryPage({ onBack }: { onBack: () => void }) {
         </section>
 
         {/* Recent Section */}
-        <section className="space-y-6">
-          <div className="flex justify-between items-end">
-            <h2 className="text-2xl flex items-center gap-2">
-              <Clock size={24} className="text-brew-amber" /> Recently Brewed
+        <section className="space-y-8">
+          <div className="flex items-baseline gap-4">
+            <h2 className="font-headline text-4xl font-black uppercase tracking-tighter">
+              Recently Brewed
             </h2>
+            <div className="h-px flex-grow bg-vb-on-surface/10" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* More mock items could go here */}
-            <div className="col-span-full py-24 text-center border-2 border-dashed border-brew-cream/5 rounded-3xl">
-              <p className="text-brew-cream/20 italic">더 많은 맥주들이 발효 중입니다...</p>
-            </div>
+          <div className="py-24 text-center border-2 border-dashed border-vb-on-surface/10 rounded-xl">
+            <div className="text-4xl mb-4">🍺</div>
+            <p className="text-vb-on-surface/30 font-headline font-bold uppercase tracking-wider">
+              더 많은 맥주들이 발효 중입니다...
+            </p>
           </div>
         </section>
       </main>

@@ -26,7 +26,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-brew-black text-brew-cream font-sans">
+    <div className="min-h-screen bg-vb-bg text-vb-on-surface font-body">
       {view === 'landing' && (
         <LandingPage 
           onStart={() => setView('create')} 
